@@ -14,9 +14,12 @@ Specifically, ``big_10_football_directed.gml`` is compiled by myself to test com
 
 Change log:
 
+- 04-29-2019 (Kevin S. Brown)
+  Pushed changes that allow working with weighted graphs (either directed or undirected).
+
 - 02-23-2018
   Test on Python 3
 
 - 10-20-2017
   Updated python codes to use NetworkX 2 APIs. See https://networkx.github.io/documentation/stable/release/release_2.0.html.
-  Later in the day, I added a wrapper function to retrieve the largest eigenvalue and vector for 2x2 matrices since scipy.sparse.linalg.eigs do not work in that case. 
+  Later in the day, I added a wrapper function to retrieve the largest eigenvalue and vector for 2x2 matrices since scipy.sparse.linalg.eigs do not work in that case.

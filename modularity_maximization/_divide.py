@@ -3,7 +3,7 @@
 import numpy as np
 import networkx as nx
 from scipy import sparse
-from modularity_maximization import utils
+from modularity_maximization import modularity
 
 def _divide(network, community_dict, comm_index, B, refine=False):
     '''
@@ -25,11 +25,11 @@ def _divide(network, community_dict, comm_index, B, refine=False):
 
     comm_nodes = tuple(u for u in community_dict \
                   if community_dict[u] == comm_index)
-    B_hat_g = utils.get_mod_matrix(network, comm_nodes, B)
+    B_hat_g = modularity.get_mod_matrix(network, comm_nodes, B)
 
     # compute the top eigenvector u₁ and β₁
     if B_hat_g.shape[0] < 3:
-        beta_s, u_s = utils.largest_eig(B_hat_g)
+        beta_s, u_s = modularity.largest_eig(B_hat_g)
     else:
         beta_s, u_s = sparse.linalg.eigs(B_hat_g, k=1, which='LR')
     u_1 = u_s[:, 0]
@@ -39,7 +39,7 @@ def _divide(network, community_dict, comm_index, B, refine=False):
         s = sparse.csc_matrix(np.asmatrix([[1 if u_1_i > 0 else -1] for u_1_i in u_1]))
         if refine:
             improve_modularity(network, comm_nodes, s, B)
-        delta_modularity = utils._get_delta_Q(B_hat_g, s)
+        delta_modularity = modularity._get_delta_Q(B_hat_g, s)
         if delta_modularity > 0:
             g1_nodes = np.array([comm_nodes[i] \
                                  for i in range(u_1.shape[0]) \
@@ -52,6 +52,7 @@ def _divide(network, community_dict, comm_index, B, refine=False):
             return g1_nodes, comm_nodes
     # indivisble, return None
     return None, None
+
 
 def improve_modularity(network, comm_nodes, s, B):
     '''
@@ -71,7 +72,7 @@ def improve_modularity(network, comm_nodes, s, B):
     '''
 
     # iterate until no increment of Q
-    B_hat_g = utils.get_mod_matrix(network, comm_nodes, B)
+    B_hat_g = modularity.get_mod_matrix(network, comm_nodes, B)
     while True:
         unmoved = list(comm_nodes)
         # node indices to be moved
@@ -81,12 +82,12 @@ def improve_modularity(network, comm_nodes, s, B):
         # keep moving until none left
         while len(unmoved) > 0:
             # init Q
-            Q0 = utils._get_delta_Q(B_hat_g, s)
+            Q0 = modularity._get_delta_Q(B_hat_g, s)
             scores = np.zeros(len(unmoved))
             for k_index in range(scores.size):
                 k = comm_nodes.index(unmoved[k_index])
                 s[k, 0] = -s[k, 0]
-                scores[k_index] = utils._get_delta_Q(B_hat_g, s) - Q0
+                scores[k_index] = modularity._get_delta_Q(B_hat_g, s) - Q0
                 s[k, 0] = -s[k, 0]
             _j = np.argmax(scores)
             j = comm_nodes.index(unmoved[_j])
@@ -112,6 +113,6 @@ def improve_modularity(network, comm_nodes, s, B):
             delta_modularity = 0
         else:
             delta_modularity = node_improvement[max_index]
-        # Stop if ΔQ <= 0 
+        # Stop if ΔQ <= 0
         if delta_modularity <= 0:
             break
