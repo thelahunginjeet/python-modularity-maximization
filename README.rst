@@ -15,7 +15,7 @@ Specifically, ``big_10_football_directed.gml`` is compiled by myself to test com
 Change log:
 
 - 04-29-2019 (Kevin S. Brown)
-  Pushed changes that allow working with weighted graphs (either directed or undirected).
+  Edge weights are now supported, for both directed and undirected graphs.
 
 - 02-23-2018
   Test on Python 3
